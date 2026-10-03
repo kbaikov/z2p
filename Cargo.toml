@@ -18,8 +18,14 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 [dev-dependencies]
 reqwest = "0"
 
-[lints.clippy]
-pedantic = { level = "warn", priority = -1 }
-
-# DEVELOPING LINTS
-nursery = { level = "warn", priority = -1 }
+[dependencies.sqlx]
+version = "0"
+default-features = false
+features = [
+    "runtime-tokio-rustls",
+    "macros",
+    "postgres",
+    "uuid",
+    "chrono",
+    "migrate"
+]
