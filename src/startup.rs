@@ -7,6 +7,9 @@ use actix_web::dev::Server;
 use actix_web::{App, HttpServer, web};
 use sqlx::PgPool;
 
+/// # Errors
+///
+/// Will return `Err` if cannot bind a listener for accepting incoming connection requests.
 pub fn run(listener: TcpListener, connection: PgPool) -> Result<Server, std::io::Error> {
     // wrap connection in Arc
     let db_pool = web::Data::new(connection);

@@ -22,6 +22,10 @@ impl DatabaseSettings {
     }
 }
 
+/// # Errors
+///
+/// Will return `Err` if `configuration.toml` does not exist or the user does not have
+/// permission to read it.
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let settings = config::Config::builder()
         .add_source(config::File::new(
