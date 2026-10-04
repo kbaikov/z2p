@@ -1,6 +1,10 @@
-use sqlx::{PgPool, query};
+use sqlx::{Connection, Executor, PgConnection, PgPool, query};
 use std::net::TcpListener;
-use z2p::{configuration::get_configuration, startup::run};
+use uuid::Uuid;
+use z2p::{
+    configuration::{DatabaseSettings, get_configuration},
+    startup::run,
+};
 
 pub struct TestApp {
     pub address: String,
@@ -12,16 +16,42 @@ async fn spawn_app() -> TestApp {
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     let port = listener.local_addr().unwrap().port();
 
-    let configuration = get_configuration().expect("Failed to read configuration");
-    let connection_pool = PgPool::connect(&configuration.database.connection_string())
-        .await
-        .expect("Failed to connect to Postgres");
+    let mut configuration = get_configuration().expect("Failed to read configuration");
+    // use random db name for testing
+    configuration.database.database_name = Uuid::new_v4().to_string();
+
+    let connection_pool = configure_database(&configuration.database).await;
+
     let server = run(listener, connection_pool.clone()).expect("Failed to bind address");
     tokio::spawn(server);
     TestApp {
         address: format!("http:/127.0.0.1:{}", port),
         db_pool: connection_pool,
     }
+}
+
+async fn configure_database(config: &DatabaseSettings) -> PgPool {
+    // create db
+    let mut connection = PgConnection::connect(&config.connection_string_without_db())
+        .await
+        .expect("Failed to connect to Postgress.");
+
+    connection
+        .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
+        .await
+        .expect("Failed to create database.");
+
+    // migrate database
+    let connection_pool = PgPool::connect(&config.connection_string())
+        .await
+        .expect("Failet to connect to Postgres pool.");
+
+    sqlx::migrate!("./migrations")
+        .run(&connection_pool)
+        .await
+        .expect("Failed to migratie the database");
+
+    connection_pool
 }
 
 #[tokio::test]
