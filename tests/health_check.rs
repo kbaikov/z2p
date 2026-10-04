@@ -1,10 +1,11 @@
 use std::net::TcpListener;
+use z2p::startup::run;
 
 fn spawn_app() -> String {
     // port 0 means random available port
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     let port = listener.local_addr().unwrap().port();
-    let server = z2p::run(listener).expect("Failed to bind address");
+    let server = run(listener).expect("Failed to bind address");
     let _ = tokio::spawn(server);
     format!("http:/127.0.0.1:{}", port)
 }
