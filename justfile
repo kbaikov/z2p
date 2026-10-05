@@ -17,3 +17,6 @@ audit:
 
 coverage:
 	cargo tarpaulin
+
+zizmor:
+	uvx zizmor --gh-token $(gh auth token) --quiet --fix=all .github
