@@ -28,7 +28,7 @@ reqwest = "0"
 version = "0"
 default-features = false
 features = [
-    "runtime-tokio-rustls",
+    "runtime-tokio",
     "macros",
     "postgres",
     "uuid",
