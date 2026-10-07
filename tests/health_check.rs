@@ -4,7 +4,16 @@ use uuid::Uuid;
 use z2p::{
     configuration::{DatabaseSettings, get_configuration},
     startup::run,
+    telemetry::{get_subscriber, init_subscriber},
 };
+
+use once_cell::sync::Lazy;
+
+// Ensure that the `tracing` stack is only initialised once using `once_cell`
+static TRACING: Lazy<()> = Lazy::new(|| {
+    let subscriber = get_subscriber("test".into(), "debug".into());
+    init_subscriber(subscriber);
+});
 
 pub struct TestApp {
     pub address: String,
@@ -12,6 +21,10 @@ pub struct TestApp {
 }
 
 async fn spawn_app() -> TestApp {
+    // The first time `initialize` is invoked the code in `TRACING` is executed.
+    // All other invocations will instead skip execution.
+    Lazy::force(&TRACING);
+
     // port 0 means random available port
     let listener = TcpListener::bind("127.0.0.1:0").expect("Failed to bind random port");
     let port = listener.local_addr().unwrap().port();
