@@ -55,10 +55,17 @@ impl DatabaseSettings {
 /// Will return `Err` if `configuration.toml` does not exist or the user does not have
 /// permission to read it.
 pub fn get_configuration() -> Result<Settings, config::ConfigError> {
+    let base_path = std::env::current_dir().expect("Failed to determine the current dir");
+    let config_directory = base_path.join("configuration");
+
+    let environment = std::env::var("APP_ENVIRONMENT").unwrap_or("local".into());
+
+    let environment_filename = format!("{}.toml", environment);
+
     let settings = config::Config::builder()
-        .add_source(config::File::new(
-            "configuration.toml",
-            config::FileFormat::Toml,
+        .add_source(config::File::from(config_directory.join("base.toml")))
+        .add_source(config::File::from(
+            config_directory.join(environment_filename),
         ))
         .build()?;
     settings.try_deserialize()

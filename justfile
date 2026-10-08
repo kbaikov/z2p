@@ -20,3 +20,10 @@ coverage:
 
 zizmor:
 	uvx zizmor --gh-token $(gh auth token) --quiet --fix=all .github
+
+podman-build:
+	podman build --tag z2p --file Dockerfile .
+
+podman-run:
+	podman run -p 8000:8000 z2p
+
