@@ -14,6 +14,7 @@ path = "src/main.rs"
 actix-web = "4"
 chrono = { version = "0", default-features = false, features = ["clock"] }
 config = { version = "0", default-features = false, features = ["toml"] }
+reqwest = { version = "0", default-features = false, features = ["json", "rustls"] }
 secrecy = { version = "0", features = ["serde"] }
 serde = "1"
 serde-aux = "4"
@@ -32,4 +33,3 @@ validator = "0"
 fake = "5"
 quickcheck = "1"
 quickcheck_macros = "1"
-reqwest = { version = "0", features = ["json"] }

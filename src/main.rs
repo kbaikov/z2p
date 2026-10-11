@@ -2,6 +2,7 @@ use std::net::TcpListener;
 
 use sqlx::PgPool;
 use z2p::configuration::get_configuration;
+use z2p::email_client::EmailClient;
 use z2p::startup::run;
 use z2p::telemetry::{get_subscriber, init_subscriber};
 
@@ -19,5 +20,11 @@ async fn main() -> Result<(), std::io::Error> {
     );
     let listener = TcpListener::bind(address)?;
 
-    run(listener, connection_pool)?.await
+    let sender_email = configuration
+        .email_client
+        .sender()
+        .expect("invalid email client address.");
+    let email_client = EmailClient::new(configuration.email_client.base_url, sender_email);
+
+    run(listener, connection_pool, email_client)?.await
 }
