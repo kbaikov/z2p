@@ -30,4 +30,6 @@ validator = "0"
 
 [dev-dependencies]
 fake = "5"
+quickcheck = "1"
+quickcheck_macros = "1"
 reqwest = { version = "0", features = ["json"] }
