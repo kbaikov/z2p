@@ -1,4 +1,6 @@
 use reqwest::Client;
+use secrecy::{ExposeSecret, SecretString};
+use serde::Serialize;
 
 use crate::domain::subscriber_email::SubscriberEmail;
 
@@ -6,14 +8,29 @@ pub struct EmailClient {
     http_client: Client,
     base_url: String,
     sender: SubscriberEmail,
+    authorization_token: SecretString,
+}
+
+#[derive(Serialize)]
+struct SendEmailRequest {
+    from: String,
+    to: String,
+    subject: String,
+    html_body: String,
+    text_body: String,
 }
 
 impl EmailClient {
-    pub fn new(base_url: String, sender: SubscriberEmail) -> Self {
+    pub fn new(
+        base_url: String,
+        sender: SubscriberEmail,
+        authorization_token: SecretString,
+    ) -> Self {
         Self {
             http_client: Client::new(),
             base_url,
             sender,
+            authorization_token,
         }
     }
     pub async fn send_email(
@@ -22,7 +39,26 @@ impl EmailClient {
         subject: &str,
         html_content: &str,
         text_content: &str,
-    ) -> Result<(), String> {
+    ) -> Result<(), reqwest::Error> {
+        let url = format!("{}/email", self.base_url);
+        let request_body = SendEmailRequest {
+            from: self.sender.as_ref().to_owned(),
+            to: recipient.as_ref().to_owned(),
+            subject: subject.to_owned(),
+            html_body: html_content.to_owned(),
+            text_body: text_content.to_owned(),
+        };
+        let _ = self
+            .http_client
+            .post(&url)
+            .header(
+                "X-Postmark-Server-Token",
+                self.authorization_token.expose_secret(),
+            )
+            .json(&request_body)
+            .send()
+            .await?;
+
         Ok(())
     }
 }
@@ -40,7 +76,11 @@ mod tests {
         // Arrange
         let mock_server = MockServer::start().await;
         let sender = SubscriberEmail::parse(SafeEmail().fake()).unwrap();
-        let email_client = EmailClient::new(mock_server.uri(), sender);
+        let email_client = EmailClient::new(
+            mock_server.uri(),
+            sender,
+            SecretString::new(String::from("hello").into_boxed_str()),
+        );
 
         Mock::given(any())
             .respond_with(ResponseTemplate::new(200))
@@ -58,5 +98,7 @@ mod tests {
             .await;
 
         // Assert
+        // if we made at least one matching request, the expectation is satisfied.
+        // The `MockServer` will shutdown peacefully, without panicking.
     }
 }
