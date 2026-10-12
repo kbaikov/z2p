@@ -19,7 +19,7 @@ secrecy = { version = "0", features = ["serde"] }
 serde = "1"
 serde-aux = "4"
 sqlx = { version = "0.8", default-features = false, features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "uuid"] }
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
 tracing = { version = "0", features = ["log"] }
 tracing-actix-web = "0"
 tracing-bunyan-formatter = "0"
@@ -33,3 +33,4 @@ validator = "0"
 fake = "5"
 quickcheck = "1"
 quickcheck_macros = "1"
+wiremock = "0"
