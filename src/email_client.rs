@@ -9,7 +9,6 @@ pub struct EmailClient {
     base_url: String,
     sender: SubscriberEmail,
     authorization_token: SecretString,
-    timeout: std::time::Duration,
 }
 
 #[derive(Serialize)]
@@ -34,7 +33,6 @@ impl EmailClient {
             base_url,
             sender,
             authorization_token,
-            timeout,
         }
     }
     pub async fn send_email(
