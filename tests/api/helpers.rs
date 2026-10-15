@@ -7,6 +7,8 @@ use z2p::{
     telemetry::{get_subscriber, init_subscriber},
 };
 
+use sqlx::AssertSqlSafe;
+
 // Ensure that the `tracing` stack is only initialised once using `once_cell`
 static TRACING: Once = Once::new();
 
@@ -76,8 +78,9 @@ async fn configure_database(config: &DatabaseSettings) -> PgPool {
         .await
         .expect("Failed to connect to Postgress.");
 
+    let query = format!(r#"CREATE DATABASE "{}";"#, config.database_name);
     connection
-        .execute(format!(r#"CREATE DATABASE "{}";"#, config.database_name).as_str())
+        .execute(AssertSqlSafe(query))
         .await
         .expect("Failed to create database.");
 
