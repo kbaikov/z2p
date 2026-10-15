@@ -7,6 +7,7 @@ use uuid::Uuid;
 use crate::domain::new_subscriber::NewSubscriber;
 use crate::domain::subscriber_email::SubscriberEmail;
 use crate::domain::subscriber_name::SubscriberName;
+use crate::email_client::EmailClient;
 
 #[derive(Deserialize)]
 pub struct FormData {
@@ -32,16 +33,33 @@ impl TryFrom<FormData> for NewSubscriber {
         subscriber_name = %form.name
     )
 )]
-pub async fn subscribe(form: web::Form<FormData>, pool: web::Data<PgPool>) -> HttpResponse {
+pub async fn subscribe(
+    form: web::Form<FormData>,
+    pool: web::Data<PgPool>,
+    email_client: web::Data<EmailClient>,
+) -> HttpResponse {
     let new_subscriber: NewSubscriber = match form.0.try_into() {
         Ok(sub) => sub,
         Err(_) => return HttpResponse::BadRequest().finish(),
     };
 
-    match insert_subscriber(&pool, &new_subscriber).await {
-        Ok(()) => HttpResponse::Ok().finish(),
-        Err(_) => HttpResponse::InternalServerError().finish(),
-    }
+    if insert_subscriber(&pool, &new_subscriber).await.is_err() {
+        return HttpResponse::InternalServerError().finish();
+    };
+
+    if email_client
+        .send_email(
+            new_subscriber.email,
+            "Welcome",
+            "Welcome html",
+            "welcome text",
+        )
+        .await
+        .is_err()
+    {
+        return HttpResponse::InternalServerError().finish();
+    };
+    HttpResponse::Ok().finish()
 }
 
 #[tracing::instrument(

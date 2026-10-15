@@ -1,3 +1,4 @@
+#[derive(Debug)]
 pub struct SubscriberEmail(String);
 use validator::ValidateEmail;
 
