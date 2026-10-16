@@ -37,7 +37,7 @@ async fn subscribe_persists_the_new_subscriber() {
         .await;
 
     // Act
-    let response = app.post_subscriptions(body.into()).await;
+    let _ = app.post_subscriptions(body.into()).await;
 
     // Assert
     let saved = query!("SELECT email, name, status FROM subscriptions")
