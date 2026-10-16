@@ -1,6 +1,5 @@
 FROM lukemathwalker/cargo-chef:latest-rust-latest as chef
 WORKDIR /app
-RUN apt update && apt install lld clang mold -y
 
 FROM chef as planner
 COPY . .
