@@ -11,24 +11,24 @@ name = "z2p"
 path = "src/main.rs"
 
 [dependencies]
-actix-web = "4"
-chrono = { version = "0", default-features = false, features = ["clock"] }
-config = { version = "0", default-features = false, features = ["toml"] }
-rand = { version = "0", features = ["std_rng"] }
-reqwest = { version = "0", default-features = false, features = ["json", "rustls"] }
-secrecy = { version = "0", features = ["serde"] }
-serde = "1"
-serde-aux = "4"
-sqlx = { version = "0", default-features = false, features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "uuid"] }
-tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
-tracing = { version = "0", features = ["log"] }
-tracing-actix-web = "0"
-tracing-bunyan-formatter = "0"
-tracing-log = "0"
-tracing-subscriber = { version = "0", features = ["env-filter", "registry"] }
-unicode-segmentation = "1"
-uuid = { version = "1", features = ["v4"] }
-validator = "0"
+actix-web = "*"
+chrono = { version = "*", default-features = false, features = ["clock"] }
+config = { version = "*", default-features = false, features = ["toml"] }
+rand = { version = "*", features = ["std_rng"] }
+reqwest = { version = "*", default-features = false, features = ["json", "rustls"] }
+secrecy = { version = "*", features = ["serde"] }
+serde = "*"
+serde-aux = "*"
+sqlx = { version = "*", default-features = false, features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "uuid"] }
+tokio = { version = "*", features = ["macros", "rt", "rt-multi-thread"] }
+tracing = { version = "*", features = ["log"] }
+tracing-actix-web = "*"
+tracing-bunyan-formatter = "*"
+tracing-log = "*"
+tracing-subscriber = { version = "*", features = ["env-filter", "registry"] }
+unicode-segmentation = "*"
+uuid = { version = "*", features = ["v4"] }
+validator = "*"
 
 [dev-dependencies]
 fake = "5"
