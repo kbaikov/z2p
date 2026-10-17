@@ -1,1 +1,1 @@
-Follows 'Zero to Production in Rust' book.
+actix-web subscribtion app with sqlx/Postgress backend
