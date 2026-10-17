@@ -3,9 +3,9 @@ pub struct SubscriberEmail(String);
 use validator::ValidateEmail;
 
 impl SubscriberEmail {
-    pub fn parse(s: String) -> Result<SubscriberEmail, String> {
+    pub fn parse(s: String) -> Result<Self, String> {
         if ValidateEmail::validate_email(&s) {
-            Ok(SubscriberEmail(s))
+            Ok(Self(s))
         } else {
             Err("invalid email".to_string())
         }
