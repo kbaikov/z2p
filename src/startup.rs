@@ -83,7 +83,7 @@ impl Application {
         Ok(Self { port, server })
     }
 
-    pub fn port(&self) -> u16 {
+    pub const fn port(&self) -> u16 {
         self.port
     }
 

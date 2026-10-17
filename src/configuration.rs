@@ -25,7 +25,7 @@ impl EmailClientSettings {
     pub fn sender(&self) -> Result<SubscriberEmail, String> {
         SubscriberEmail::parse(self.sender_email.clone())
     }
-    pub fn timeout(&self) -> std::time::Duration {
+    pub const fn timeout(&self) -> std::time::Duration {
         std::time::Duration::from_millis(self.timeout_milliseconds)
     }
 }
@@ -79,7 +79,7 @@ pub fn get_configuration() -> Result<Settings, config::ConfigError> {
     let base_path = std::env::current_dir().expect("Failed to determine the current dir");
     let config_directory = base_path.join("configuration");
 
-    let environment = std::env::var("APP_ENVIRONMENT").unwrap_or("local".into());
+    let environment = std::env::var("APP_ENVIRONMENT").unwrap_or_else(|_| "local".into());
 
     let environment_filename = format!("{}.toml", environment);
 
