@@ -3380,6 +3380,7 @@ dependencies = [
  "linkify",
  "quickcheck",
  "quickcheck_macros",
+ "rand",
  "reqwest",
  "secrecy",
  "serde",
