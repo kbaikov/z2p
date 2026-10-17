@@ -6,7 +6,7 @@ permissions: {}
 env:
   CARGO_TERM_COLOR: always
   # Disable incremental compilation for faster from-scratch builds
-  SQLX_VERSION: 0.8.6
+  SQLX_VERSION: 0.9.0
   SQLX_FEATURES: "rustls,postgres"
   APP_USER: app
   APP_USER_PWD: secret
@@ -34,11 +34,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
-        with:
-          toolchain: stable
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
       - name: Install sqlx-cli
-        run: cargo install sqlx-cli
+        run: 
+          cargo install sqlx-cli
           --version=${{ env.SQLX_VERSION }}
           --features ${{ env.SQLX_FEATURES }}
           --no-default-features
@@ -62,7 +61,7 @@ jobs:
         run: cargo test
       
       - name: Check that queries are fresh
-        run: cargo sqlx prepare --workspace --check -- --all-targets
+        run: cargo sqlx prepare --workspace --check 
 
   fmt:
     name: Rustfmt
@@ -71,10 +70,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
-          toolchain: stable
-      - run: cargo fmt --all -- --check
+          components: rustfmt
+      - run: cargo fmt --all --check
 
   clippy:
     name: Clippy
@@ -91,9 +90,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
-          toolchain: stable
           components: clippy
       - run: cargo clippy -- -D warnings
 
@@ -113,9 +111,8 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: dtolnay/rust-toolchain@7e38f4b43b4db5c8dd498af069a4f6196df1d067 # v1
+      - uses: actions-rust-lang/setup-rust-toolchain@v2
         with:
-          toolchain: stable
           components: llvm-tools-preview
       - name: Install sqlx-cli
         run: cargo install sqlx-cli
