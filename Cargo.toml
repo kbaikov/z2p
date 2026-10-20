@@ -20,6 +20,7 @@ secrecy = { version = "*", features = ["serde"] }
 serde = "*"
 serde-aux = "*"
 sqlx = { version = "*", default-features = false, features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "uuid"] }
+thiserror = "2"
 tokio = { version = "*", features = ["macros", "rt", "rt-multi-thread"] }
 tracing = { version = "*", features = ["log"] }
 tracing-actix-web = "*"
