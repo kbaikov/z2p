@@ -12,6 +12,7 @@ path = "src/main.rs"
 
 [dependencies]
 actix-web = "*"
+anyhow = "1"
 chrono = { version = "*", default-features = false, features = ["clock"] }
 config = { version = "*", default-features = false, features = ["toml"] }
 rand = { version = "*", features = ["std_rng"] }

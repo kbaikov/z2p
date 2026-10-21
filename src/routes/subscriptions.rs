@@ -1,5 +1,6 @@
 use actix_web::http::StatusCode;
 use actix_web::{HttpResponse, ResponseError, web};
+use anyhow::Context;
 use chrono::Utc;
 use rand::RngExt;
 use rand::distr::Alphanumeric;
@@ -40,6 +41,8 @@ pub enum SubscribeError {
     StoreTokenError(#[from] StoreTokenError),
     #[error("Failed to send a confirmation email.")]
     SendEmailError(#[from] reqwest::Error),
+    #[error(transparent)]
+    UnexpectedError(#[from] anyhow::Error),
 }
 
 impl std::fmt::Debug for SubscribeError {
@@ -56,6 +59,7 @@ impl ResponseError for SubscribeError {
             | SubscribeError::TransactionCommitError(_)
             | SubscribeError::InsertSubscriberError(_)
             | SubscribeError::StoreTokenError(_)
+            | SubscribeError::UnexpectedError(_)
             | SubscribeError::SendEmailError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -142,7 +146,8 @@ pub async fn subscribe(
         &base_url.0,
         &subscription_token,
     )
-    .await?;
+    .await
+    .context("Failed to send a confirmation Error.")?;
     Ok(HttpResponse::Ok().finish())
 }
 
@@ -211,12 +216,6 @@ async fn insert_subscriber(
         new_subscriber.name.as_ref(),
         Utc::now()
     );
-    transaction.execute(query).await.map_err(|e| {
-        tracing::error!("Failed to execute query: {:?}", e);
-        e
-        // Using the `?` operator to return early
-        // if the function failed, returning a sqlx::Error
-        // We will talk about error handling in depth later!
-    })?;
+    transaction.execute(query).await?;
     Ok(subscriber_id)
 }
