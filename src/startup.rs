@@ -3,6 +3,7 @@ use std::net::TcpListener;
 use crate::configuration::Settings;
 use crate::email_client::EmailClient;
 use crate::routes::health_check::health_check;
+use crate::routes::newsletters::publish_newsletter;
 use crate::routes::subscriptions::subscribe;
 use crate::routes::subscriptions_confirm::confirm;
 use sqlx::postgres::PgPoolOptions;
@@ -42,6 +43,7 @@ pub fn run(
             .wrap(TracingLogger::default())
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
+            .route("/newsletters", web::post().to(publish_newsletter))
             .route("/subscriptions/confirm", web::get().to(confirm))
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
