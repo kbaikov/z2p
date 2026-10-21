@@ -54,13 +54,13 @@ impl std::fmt::Debug for SubscribeError {
 impl ResponseError for SubscribeError {
     fn status_code(&self) -> actix_web::http::StatusCode {
         match self {
-            SubscribeError::ValidationError(_) => StatusCode::BAD_REQUEST,
-            SubscribeError::PoolError(_)
-            | SubscribeError::TransactionCommitError(_)
-            | SubscribeError::InsertSubscriberError(_)
-            | SubscribeError::StoreTokenError(_)
-            | SubscribeError::UnexpectedError(_)
-            | SubscribeError::SendEmailError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::ValidationError(_) => StatusCode::BAD_REQUEST,
+            Self::PoolError(_)
+            | Self::TransactionCommitError(_)
+            | Self::InsertSubscriberError(_)
+            | Self::StoreTokenError(_)
+            | Self::UnexpectedError(_)
+            | Self::SendEmailError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }
