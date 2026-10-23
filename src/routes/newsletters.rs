@@ -107,7 +107,7 @@ pub async fn publish_newsletter(
     request: HttpRequest,
 ) -> Result<HttpResponse, PublishError> {
     let credentials = basic_authentication(request.headers()).map_err(PublishError::AuthError)?;
-    let user_id = validate_credentials(credentials, &pool).await?;
+    let _user_id = validate_credentials(credentials, &pool).await?;
     let subscribers = get_confirmed_subscribers(&pool).await?;
 
     for subscriber in subscribers {
@@ -146,14 +146,16 @@ async fn validate_credentials(
     credentials: Credentials,
     pool: &PgPool,
 ) -> Result<uuid::Uuid, PublishError> {
+    let password_hash = blake3::hash(credentials.password.expose_secret().as_bytes());
+    let password_hash = format!("{}", password_hash);
     let user_id: Option<_> = sqlx::query!(
         r#"
         SELECT user_id
         FROM users
-        WHERE username = $1 AND password = $2
+        WHERE username = $1 AND password_hash = $2
         "#,
         credentials.username,
-        credentials.password.expose_secret()
+        password_hash
     )
     .fetch_optional(pool)
     .await
