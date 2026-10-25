@@ -13,11 +13,11 @@ path = "src/main.rs"
 [dependencies]
 actix-web = "*"
 anyhow = "1"
+argon2 = { version = "0.5", features = ["std"] }
 base64 = "*"
-blake3 = "1.8.7"
 chrono = { version = "*", default-features = false, features = ["clock"] }
 config = { version = "*", default-features = false, features = ["toml"] }
-rand = { version = "*", features = ["std_rng"] }
+rand = { version = "0.8", features = ["std_rng"] }
 reqwest = { version = "*", default-features = false, features = ["json", "rustls"] }
 secrecy = { version = "*", features = ["serde"] }
 serde = "*"
