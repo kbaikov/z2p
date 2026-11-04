@@ -3,6 +3,9 @@ use std::net::TcpListener;
 use crate::configuration::Settings;
 use crate::email_client::EmailClient;
 use crate::routes::health_check::health_check;
+use crate::routes::home::home;
+use crate::routes::login::login_form;
+use crate::routes::login::post::login;
 use crate::routes::newsletters::publish_newsletter;
 use crate::routes::subscriptions::subscribe;
 use crate::routes::subscriptions_confirm::confirm;
@@ -41,6 +44,9 @@ pub fn run(
     let server = HttpServer::new(move || {
         App::new()
             .wrap(TracingLogger::default())
+            .route("/", web::get().to(home))
+            .route("/login", web::get().to(login_form))
+            .route("/login", web::post().to(login))
             .route("/health_check", web::get().to(health_check))
             .route("/subscriptions", web::post().to(subscribe))
             .route("/newsletters", web::post().to(publish_newsletter))

@@ -1,6 +1,7 @@
 use crate::{
-    domain::subscriber_email::SubscriberEmail, email_client::EmailClient,
-    routes::subscriptions::error_chain_fmt, telemetry::spawn_blocking_with_tracing,
+    authentication::AuthError, domain::subscriber_email::SubscriberEmail,
+    email_client::EmailClient, routes::subscriptions::error_chain_fmt,
+    telemetry::spawn_blocking_with_tracing,
 };
 use actix_web::{
     HttpRequest, HttpResponse, ResponseError,
@@ -108,7 +109,12 @@ pub async fn publish_newsletter(
     request: HttpRequest,
 ) -> Result<HttpResponse, PublishError> {
     let credentials = basic_authentication(request.headers()).map_err(PublishError::AuthError)?;
-    let _user_id = validate_credentials(credentials, &pool).await?;
+    let _user_id = validate_credentials(credentials, &pool)
+        .await
+        .map_err(|e| match e {
+            AuthError::InvalidCredentials(_) => PublishError::AuthError(e.into()),
+            AuthError::UnexpectedError(_) => PublishError::UnexpectedError(e.into()),
+        });
     let subscribers = get_confirmed_subscribers(&pool).await?;
 
     for subscriber in subscribers {
@@ -147,7 +153,7 @@ pub async fn publish_newsletter(
 async fn validate_credentials(
     credentials: Credentials,
     pool: &PgPool,
-) -> Result<uuid::Uuid, PublishError> {
+) -> Result<uuid::Uuid, AuthError> {
     let mut user_id = None;
     let mut expected_password_hash = SecretString::new(
         "$argon2id$v=19$m=15000,t=2,p=1$\
@@ -157,9 +163,7 @@ CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno"
             .into_boxed_str(),
     );
     if let Some((stored_user_id, stored_password_hash)) =
-        get_stored_credentials(&credentials.username, pool)
-            .await
-            .map_err(PublishError::UnexpectedError)?
+        get_stored_credentials(&credentials.username, pool).await?
     {
         user_id = Some(stored_user_id);
         expected_password_hash = stored_password_hash;
@@ -170,13 +174,13 @@ CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno"
     })
     .await
     .context("Invalid password.")
-    .map_err(PublishError::AuthError)??;
+    .map_err(AuthError::InvalidCredentials)??;
 
     // This is only set to `Some` if we found credentials in the store
     // So, even if the default password ends up matching (somehow)
     // with the provided password,
     // we never authenticate a non-existing user.
-    user_id.ok_or_else(|| PublishError::AuthError(anyhow::anyhow!("Unknown username.")))
+    user_id.ok_or_else(|| AuthError::InvalidCredentials(anyhow::anyhow!("Unknown username.")))
 }
 
 #[tracing::instrument(
@@ -186,17 +190,17 @@ CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno"
 fn verify_password_hash(
     expected_password_hash: &SecretString,
     password_candidate: &SecretString,
-) -> Result<(), PublishError> {
+) -> Result<(), AuthError> {
     let expected_password_hash = PasswordHash::new(expected_password_hash.expose_secret())
         .context("Failed to parse hash in PHC string format.")
-        .map_err(PublishError::UnexpectedError)?;
+        .map_err(AuthError::UnexpectedError)?;
     Argon2::default()
         .verify_password(
             password_candidate.expose_secret().as_bytes(),
             &expected_password_hash,
         )
         .context("Invalid password.")
-        .map_err(PublishError::AuthError)
+        .map_err(AuthError::InvalidCredentials)
 }
 
 #[tracing::instrument(name = "Get stored credentials", skip(username, pool))]
