@@ -4,7 +4,7 @@ use crate::configuration::Settings;
 use crate::email_client::EmailClient;
 use crate::routes::health_check::health_check;
 use crate::routes::home::home;
-use crate::routes::login::login_form;
+use crate::routes::login::get::login_form;
 use crate::routes::login::post::login;
 use crate::routes::newsletters::publish_newsletter;
 use crate::routes::subscriptions::subscribe;
