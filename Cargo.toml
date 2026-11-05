@@ -17,11 +17,15 @@ argon2 = { version = "0.5", features = ["std"] }
 base64 = "*"
 chrono = { version = "*", default-features = false, features = ["clock"] }
 config = { version = "*", default-features = false, features = ["toml"] }
+hex = "*"
+hmac = "*"
+htmlescape = "*"
 rand = { version = "0.8", features = ["std_rng"] }
 reqwest = { version = "*", default-features = false, features = ["json", "rustls"] }
 secrecy = { version = "*", features = ["serde"] }
 serde = "*"
 serde-aux = "*"
+sha2 = "0.10"
 sqlx = { version = "*", default-features = false, features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "uuid"] }
 thiserror = "2"
 tokio = { version = "*", features = ["macros", "rt", "rt-multi-thread"] }
@@ -31,7 +35,7 @@ tracing-bunyan-formatter = "*"
 tracing-log = "*"
 tracing-subscriber = { version = "*", features = ["env-filter", "registry"] }
 unicode-segmentation = "*"
-urlencoding = "2"
+urlencoding = "*"
 uuid = { version = "*", features = ["v4"] }
 validator = "*"
 

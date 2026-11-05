@@ -9,6 +9,8 @@ use crate::routes::login::post::login;
 use crate::routes::newsletters::publish_newsletter;
 use crate::routes::subscriptions::subscribe;
 use crate::routes::subscriptions_confirm::confirm;
+use actix_web::web::Data;
+use secrecy::SecretString;
 use sqlx::postgres::PgPoolOptions;
 
 use actix_web::dev::Server;
@@ -28,6 +30,9 @@ pub struct Application {
 // a raw `String` would expose us to conflicts.
 pub struct ApplicationBaseUrl(pub String);
 
+#[derive(Clone)]
+pub struct HmacSecret(pub SecretString);
+
 /// # Errors
 ///
 /// Will return `Err` if cannot bind a listener for accepting incoming connection requests.
@@ -36,6 +41,7 @@ pub fn run(
     connection: PgPool,
     email_client: EmailClient,
     base_url: String,
+    hmac_secret: SecretString,
 ) -> Result<Server, std::io::Error> {
     // wrap connection in Arc
     let db_pool = web::Data::new(connection);
@@ -54,6 +60,7 @@ pub fn run(
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())
+            .app_data(Data::new(HmacSecret(hmac_secret.clone())))
     })
     .listen(listener)?
     .run();
@@ -87,6 +94,7 @@ impl Application {
             connection_pool,
             email_client,
             configuration.application.base_url,
+            configuration.application.hmac_secret,
         )?;
         Ok(Self { port, server })
     }
