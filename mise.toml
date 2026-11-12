@@ -1,0 +1,41 @@
+[tasks.all]
+description = "Run fmt, test, clippy, audit, and coverage"
+run = [
+  "mise run fmt",
+  "mise run test",
+  "mise run clippy",
+  "mise run audit",
+  "mise run coverage",
+]
+
+[tasks.fmt]
+description = "Check formatting"
+run = "cargo fmt --all -- --check"
+
+[tasks.test]
+description = "Run tests with all features"
+run = "cargo test --all-features"
+
+[tasks.clippy]
+description = "Run clippy with warnings denied"
+run = "cargo clippy -- -D warnings"
+
+[tasks.audit]
+description = "Check advisories with cargo-deny"
+run = "cargo deny check advisories"
+
+[tasks.coverage]
+description = "Run coverage with cargo-tarpaulin"
+run = "cargo tarpaulin"
+
+[tasks.zizmor]
+description = "Run zizmor on GitHub workflows"
+run = "uvx zizmor --gh-token $(gh auth token) --quiet --fix=all .github"
+
+[tasks.podman-build]
+description = "Build container image with podman"
+run = "podman build --tag z2p --file Dockerfile ."
+
+[tasks.podman-run]
+description = "Run container image with podman"
+run = "podman run -p 8000:8000 z2p"
