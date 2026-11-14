@@ -12,6 +12,7 @@ path = "src/main.rs"
 
 [dependencies]
 actix-web = "*"
+actix-web-flash-messages = { version = "*", features = ["cookies"] }
 anyhow = "1"
 argon2 = { version = "0.5", features = ["std"] }
 base64 = "*"

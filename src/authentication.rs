@@ -26,8 +26,8 @@ fn verify_password_hash(
     password_candidate: &SecretString,
 ) -> Result<(), AuthError> {
     let expected_password_hash = PasswordHash::new(expected_password_hash.expose_secret())
-        .context("Failed to parse hash in PHC string format.")
-        .map_err(AuthError::UnexpectedError)?;
+        .context("Failed to parse hash in PHC string format.")?;
+
     Argon2::default()
         .verify_password(
             password_candidate.expose_secret().as_bytes(),
@@ -75,6 +75,7 @@ CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno"
             .to_string()
             .into_boxed_str(),
     );
+
     if let Some((stored_user_id, stored_password_hash)) =
         get_stored_credentials(&credentials.username, pool).await?
     {
@@ -86,12 +87,9 @@ CWOrkoo7oJBQ/iyh7uJ0LO2aLEfrHwTWllSAxT0zRno"
         verify_password_hash(&expected_password_hash, &credentials.password)
     })
     .await
-    .context("Invalid password.")
-    .map_err(AuthError::InvalidCredentials)??;
+    .context("Invalid password.")??;
 
-    // This is only set to `Some` if we found credentials in the store
-    // So, even if the default password ends up matching (somehow)
-    // with the provided password,
-    // we never authenticate a non-existing user.
-    user_id.ok_or_else(|| AuthError::InvalidCredentials(anyhow::anyhow!("Unknown username.")))
+    user_id
+        .ok_or_else(|| anyhow::anyhow!("Unknown username."))
+        .map_err(AuthError::InvalidCredentials)
 }
