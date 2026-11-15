@@ -2,6 +2,7 @@ use std::net::TcpListener;
 
 use crate::configuration::Settings;
 use crate::email_client::EmailClient;
+use crate::routes::admin::dashboard::admin_dashboard;
 use crate::routes::health_check::health_check;
 use crate::routes::home::home;
 use crate::routes::login::get::login_form;
@@ -71,6 +72,7 @@ async fn run(
             .route("/subscriptions", web::post().to(subscribe))
             .route("/newsletters", web::post().to(publish_newsletter))
             .route("/subscriptions/confirm", web::get().to(confirm))
+            .route("/admin/dashboard", web::get().to(admin_dashboard))
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())
@@ -109,7 +111,7 @@ impl Application {
             email_client,
             configuration.application.base_url,
             configuration.application.hmac_secret,
-            configuration.redis_uri,
+            configuration.application.redis_uri,
         )
         .await?;
         Ok(Self { port, server })

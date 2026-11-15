@@ -19,7 +19,6 @@ argon2 = { version = "0.5", features = ["std"] }
 base64 = "*"
 chrono = { version = "*", default-features = false, features = ["clock"] }
 config = { version = "*", default-features = false, features = ["toml"] }
-htmlescape = "*"
 rand = { version = "0.8", features = ["std_rng"] }
 reqwest = { version = "*", default-features = false, features = ["cookies", "form", "json", "rustls"] }
 secrecy = { version = "*", features = ["serde"] }
@@ -34,7 +33,6 @@ tracing-bunyan-formatter = "*"
 tracing-log = "*"
 tracing-subscriber = { version = "*", features = ["env-filter", "registry"] }
 unicode-segmentation = "*"
-urlencoding = "*"
 uuid = { version = "*", features = ["v4"] }
 validator = "*"
 
