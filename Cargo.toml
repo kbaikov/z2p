@@ -33,7 +33,7 @@ tracing-bunyan-formatter = "*"
 tracing-log = "*"
 tracing-subscriber = { version = "*", features = ["env-filter", "registry"] }
 unicode-segmentation = "*"
-uuid = { version = "*", features = ["v4"] }
+uuid = { version = "*", features = ["serde", "v4"] }
 validator = "*"
 
 [dev-dependencies]
