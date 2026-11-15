@@ -11,6 +11,7 @@ name = "z2p"
 path = "src/main.rs"
 
 [dependencies]
+actix-session = { version = "*", features = ["redis-session-native-tls"] }
 actix-web = "*"
 actix-web-flash-messages = { version = "*", features = ["cookies"] }
 anyhow = "1"
