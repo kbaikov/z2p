@@ -3,6 +3,7 @@ use std::net::TcpListener;
 use crate::configuration::Settings;
 use crate::email_client::EmailClient;
 use crate::routes::admin::dashboard::admin_dashboard;
+use crate::routes::admin::password::{change_password, change_password_form};
 use crate::routes::health_check::health_check;
 use crate::routes::home::home;
 use crate::routes::login::get::login_form;
@@ -73,6 +74,8 @@ async fn run(
             .route("/newsletters", web::post().to(publish_newsletter))
             .route("/subscriptions/confirm", web::get().to(confirm))
             .route("/admin/dashboard", web::get().to(admin_dashboard))
+            .route("/admin/password", web::get().to(change_password_form))
+            .route("/admin/password", web::post().to(change_password))
             .app_data(db_pool.clone())
             .app_data(email_client.clone())
             .app_data(base_url.clone())
